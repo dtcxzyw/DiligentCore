@@ -983,7 +983,7 @@ DILIGENT_BEGIN_INTERFACE(IDeviceContext, IObject)
                                              Uint32                               drawCallCount) {
 		DrawIndexedIndirectAttribs DIIA = Attribs;
 		for(Uint32 i=0;i<drawCallCount;++i) {
-			DrawIndexedIndirect(DIA,pAttribsBuffer);
+			DrawIndexedIndirect(DIIA,pAttribsBuffer);
 			DIIA.IndirectDrawArgsOffset+=sizeof(Uint32)*5;
 		}
 	}
