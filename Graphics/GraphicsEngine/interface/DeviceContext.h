@@ -25,6 +25,8 @@
  *  of the possibility of such damages.
  */
 
+// Added `MultiDraw*Indirect`  functions by dtcxzyw
+
 #pragma once
 
 // clang-format off
@@ -930,6 +932,61 @@ DILIGENT_BEGIN_INTERFACE(IDeviceContext, IObject)
     VIRTUAL void METHOD(DrawIndexedIndirect)(THIS_
                                              const DrawIndexedIndirectAttribs REF Attribs,
                                              IBuffer*                             pAttribsBuffer) PURE;
+
+	/// Executes an indirect multi-draw command.
+
+    /// \param [in] Attribs        - Structure describing the command attributes, see Diligent::DrawIndirectAttribs for details.
+    /// \param [in] pAttribsBuffer - Pointer to the buffer, from which indirect draw attributes will be read.
+    /// \param [in] drawCallCount  - The number of attribs to draw.
+    ///
+    /// \remarks  If IndirectAttribsBufferStateTransitionMode member is Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION,
+    ///           the method may transition the state of the indirect draw arguments buffer. This is not a thread safe operation,
+    ///           so no other thread is allowed to read or write the state of the buffer.
+    ///
+    ///           If Diligent::DRAW_FLAG_VERIFY_STATES flag is set, the method reads the state of vertex/index
+    ///           buffers, so no other threads are allowed to alter the states of the same resources.
+    ///           It is OK to read these states.
+    ///
+    ///           If the application intends to use the same resources in other threads simultaneously, it needs to
+    ///           explicitly manage the states using IDeviceContext::TransitionResourceStates() method.
+    VIRTUAL void METHOD(MultiDrawIndirect)(THIS_
+                                      const DrawIndirectAttribs REF Attribs,
+                                      IBuffer*                      pAttribsBuffer,
+                                      Uint32                        drawCallCount) {
+		DrawIndirectAttribs DIA = Attribs;
+		for(Uint32 i=0;i<drawCallCount;++i) {
+			DrawIndirect(DIA,pAttribsBuffer);
+			DIA.IndirectDrawArgsOffset+=sizeof(Uint32)*4;
+		}
+	}
+
+
+    /// Executes an indexed indirect multi-draw command.
+
+    /// \param [in] Attribs        - Structure describing the command attributes, see Diligent::DrawIndexedIndirectAttribs for details.
+    /// \param [in] pAttribsBuffer - Pointer to the buffer, from which indirect draw attributes will be read.
+    /// \param [in] drawCallCount  - The number of attribs to draw.
+    ///
+    /// \remarks  If IndirectAttribsBufferStateTransitionMode member is Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION,
+    ///           the method may transition the state of the indirect draw arguments buffer. This is not a thread safe operation,
+    ///           so no other thread is allowed to read or write the state of the buffer.
+    ///
+    ///           If Diligent::DRAW_FLAG_VERIFY_STATES flag is set, the method reads the state of vertex/index
+    ///           buffers, so no other threads are allowed to alter the states of the same resources.
+    ///           It is OK to read these states.
+    ///
+    ///           If the application intends to use the same resources in other threads simultaneously, it needs to
+    ///           explicitly manage the states using IDeviceContext::TransitionResourceStates() method.
+    VIRTUAL void METHOD(MultiDrawIndexedIndirect)(THIS_
+                                             const DrawIndexedIndirectAttribs REF Attribs,
+                                             IBuffer*                             pAttribsBuffer,
+                                             Uint32                               drawCallCount) {
+		DrawIndexedIndirectAttribs DIIA = Attribs;
+		for(Uint32 i=0;i<drawCallCount;++i) {
+			DrawIndexedIndirect(DIA,pAttribsBuffer);
+			DIIA.IndirectDrawArgsOffset+=sizeof(Uint32)*5;
+		}
+	}
 
 
     /// Executes a dispatch compute command.

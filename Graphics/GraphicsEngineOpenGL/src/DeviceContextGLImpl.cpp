@@ -874,6 +874,71 @@ void DeviceContextGLImpl::DrawIndexedIndirect(const DrawIndexedIndirectAttribs& 
 #endif
 }
 
+void DeviceContextGLImpl::MultiDrawIndirect(const DrawIndirectAttribs& Attribs, IBuffer* pAttribsBuffer, Uint32 drawCallCount)
+{
+    if (!DvpVerifyDrawIndirectArguments(Attribs, pAttribsBuffer))
+        return;
+
+#if GL_ARB_multi_draw_indirect
+    GLenum GlTopology;
+    PrepareForDraw(Attribs.Flags, true, GlTopology);
+
+    // http://www.opengl.org/wiki/Vertex_Rendering
+    PrepareForIndirectDraw(pAttribsBuffer);
+
+    //typedef  struct {
+    //   GLuint  count;
+    //   GLuint  instanceCount;
+    //   GLuint  first;
+    //   GLuint  baseInstance;
+    //} DrawArraysIndirectCommand;
+    glMultiDrawArraysIndirect(GlTopology, reinterpret_cast<const void*>(static_cast<size_t>(Attribs.IndirectDrawArgsOffset)),drawCallCount,0);
+    // Note that on GLES 3.1, baseInstance is present but reserved and must be zero
+    DEV_CHECK_GL_ERROR("glMultiDrawArraysIndirect() failed");
+
+    constexpr bool ResetVAO = false; // GL_DRAW_INDIRECT_BUFFER does not affect VAO
+    m_ContextState.BindBuffer(GL_DRAW_INDIRECT_BUFFER, GLObjectWrappers::GLBufferObj::Null(), ResetVAO);
+
+    PostDraw();
+#else
+    LOG_ERROR_MESSAGE("Multi-Indirect rendering is not supported");
+#endif
+}
+
+void DeviceContextGLImpl::MultiDrawIndexedIndirect(const DrawIndexedIndirectAttribs& Attribs, IBuffer* pAttribsBuffer, Uint32 drawCallCount)
+{
+    if (!DvpVerifyDrawIndexedIndirectArguments(Attribs, pAttribsBuffer))
+        return;
+
+#if GL_ARB_multi_draw_indirect
+    GLenum GlTopology;
+    PrepareForDraw(Attribs.Flags, true, GlTopology);
+    GLenum GLIndexType;
+    Uint32 FirstIndexByteOffset;
+    PrepareForIndexedDraw(Attribs.IndexType, 0, GLIndexType, FirstIndexByteOffset);
+
+    // http://www.opengl.org/wiki/Vertex_Rendering
+    PrepareForIndirectDraw(pAttribsBuffer);
+
+    //typedef  struct {
+    //    GLuint  count;
+    //    GLuint  instanceCount;
+    //    GLuint  firstIndex;
+    //    GLuint  baseVertex;
+    //    GLuint  baseInstance;
+    //} DrawElementsIndirectCommand;
+    glMultiDrawElementsIndirect(GlTopology, GLIndexType, reinterpret_cast<const void*>(static_cast<size_t>(Attribs.IndirectDrawArgsOffset)),drawCallCount,0);
+    // Note that on GLES 3.1, baseInstance is present but reserved and must be zero
+    DEV_CHECK_GL_ERROR("glDrawElementsIndirect() failed");
+
+    constexpr bool ResetVAO = false; // GL_DISPATCH_INDIRECT_BUFFER does not affect VAO
+    m_ContextState.BindBuffer(GL_DRAW_INDIRECT_BUFFER, GLObjectWrappers::GLBufferObj::Null(), ResetVAO);
+
+    PostDraw();
+#else
+    LOG_ERROR_MESSAGE("Multi-Indirect rendering is not supported");
+#endif
+}
 
 void DeviceContextGLImpl::DispatchCompute(const DispatchComputeAttribs& Attribs)
 {
