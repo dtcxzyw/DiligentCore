@@ -553,6 +553,36 @@ void DeviceContextVkImpl::DrawIndexedIndirect(const DrawIndexedIndirectAttribs& 
     ++m_State.NumCommands;
 }
 
+void DeviceContextVkImpl::MultiDrawIndirect(const DrawIndirectAttribs& Attribs, IBuffer* pAttribsBuffer, Uint32 drawCallCount)
+{
+    if (!DvpVerifyDrawIndirectArguments(Attribs, pAttribsBuffer))
+        return;
+
+    // We must prepare indirect draw attribs buffer first because state transitions must
+    // be performed outside of render pass, and PrepareForDraw commits render pass
+    BufferVkImpl* pIndirectDrawAttribsVk = PrepareIndirectDrawAttribsBuffer(pAttribsBuffer, Attribs.IndirectAttribsBufferStateTransitionMode);
+
+    PrepareForDraw(Attribs.Flags);
+
+    m_CommandBuffer.DrawIndirect(pIndirectDrawAttribsVk->GetVkBuffer(), pIndirectDrawAttribsVk->GetDynamicOffset(m_ContextId, this) + Attribs.IndirectDrawArgsOffset, drawCallCount, 0);
+    ++m_State.NumCommands;
+}
+
+void DeviceContextVkImpl::MultiDrawIndexedIndirect(const DrawIndexedIndirectAttribs& Attribs, IBuffer* pAttribsBuffer, Uint32 drawCallCount)
+{
+    if (!DvpVerifyDrawIndexedIndirectArguments(Attribs, pAttribsBuffer))
+        return;
+
+    // We must prepare indirect draw attribs buffer first because state transitions must
+    // be performed outside of render pass, and PrepareForDraw commits render pass
+    BufferVkImpl* pIndirectDrawAttribsVk = PrepareIndirectDrawAttribsBuffer(pAttribsBuffer, Attribs.IndirectAttribsBufferStateTransitionMode);
+
+    PrepareForIndexedDraw(Attribs.Flags, Attribs.IndexType);
+
+    m_CommandBuffer.DrawIndexedIndirect(pIndirectDrawAttribsVk->GetVkBuffer(), pIndirectDrawAttribsVk->GetDynamicOffset(m_ContextId, this) + Attribs.IndirectDrawArgsOffset, drawCallCount, 0);
+    ++m_State.NumCommands;
+}
+
 
 void DeviceContextVkImpl::PrepareForDispatchCompute()
 {

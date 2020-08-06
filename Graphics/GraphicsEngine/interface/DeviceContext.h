@@ -25,8 +25,6 @@
  *  of the possibility of such damages.
  */
 
-// Added `MultiDraw*Indirect`  functions by dtcxzyw
-
 #pragma once
 
 // clang-format off
@@ -957,6 +955,7 @@ DILIGENT_BEGIN_INTERFACE(IDeviceContext, IObject)
 		for(Uint32 i=0;i<drawCallCount;++i) {
 			DrawIndirect(DIA,pAttribsBuffer);
 			DIA.IndirectDrawArgsOffset+=sizeof(Uint32)*4;
+			DIA.flags|=DRAW_FLAG_DYNAMIC_RESOURCE_BUFFERS_INTACT;
 		}
 	}
 
@@ -985,6 +984,7 @@ DILIGENT_BEGIN_INTERFACE(IDeviceContext, IObject)
 		for(Uint32 i=0;i<drawCallCount;++i) {
 			DrawIndexedIndirect(DIIA,pAttribsBuffer);
 			DIIA.IndirectDrawArgsOffset+=sizeof(Uint32)*5;
+			DIIA.flags|=DRAW_FLAG_DYNAMIC_RESOURCE_BUFFERS_INTACT;
 		}
 	}
 

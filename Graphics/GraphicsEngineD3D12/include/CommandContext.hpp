@@ -155,6 +155,12 @@ public:
         FlushResourceBarriers();
         m_pCommandList->ExecuteIndirect(pCmdSignature, 1, pBuff, ArgsOffset, nullptr, 0);
     }
+	
+	void ExecuteIndirect(ID3D12CommandSignature* pCmdSignature,Uint32 Count, ID3D12Resource* pBuff, Uint64 ArgsOffset)
+    {
+        FlushResourceBarriers();
+        m_pCommandList->ExecuteIndirect(pCmdSignature, Count, pBuff, ArgsOffset, nullptr, 0);
+    }
 
     void                       SetID(const Char* ID) { m_ID = ID; }
     ID3D12GraphicsCommandList* GetCommandList() { return m_pCommandList; }

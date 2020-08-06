@@ -1,3 +1,7 @@
+## By dtcxzyw
+
+* Added `MultiDraw*Indirect` functions and OpenGL/Vulkan/D3D12 Implementation
+
 ## Current Progress
 
 ### API Changes
