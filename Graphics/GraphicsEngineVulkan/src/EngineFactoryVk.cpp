@@ -190,6 +190,7 @@ void EngineFactoryVkImpl::CreateDeviceAndContextsVk(const EngineVkCreateInfo& _E
         ENABLE_FEATURE(vertexPipelineStoresAndAtomics);
         ENABLE_FEATURE(fragmentStoresAndAtomics);
         ENABLE_FEATURE(shaderStorageImageExtendedFormats);
+        ENABLE_FEATURE(multiDrawIndirect);
 #undef ENABLE_FEATURE
 
         DeviceCreateInfo.pEnabledFeatures = &DeviceFeatures; // NULL or a pointer to a VkPhysicalDeviceFeatures structure that contains
