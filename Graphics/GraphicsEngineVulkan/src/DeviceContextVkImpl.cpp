@@ -564,7 +564,7 @@ void DeviceContextVkImpl::MultiDrawIndirect(const DrawIndirectAttribs& Attribs, 
 
     PrepareForDraw(Attribs.Flags);
 
-    m_CommandBuffer.DrawIndirect(pIndirectDrawAttribsVk->GetVkBuffer(), pIndirectDrawAttribsVk->GetDynamicOffset(m_ContextId, this) + Attribs.IndirectDrawArgsOffset, drawCallCount, 0);
+    m_CommandBuffer.DrawIndirect(pIndirectDrawAttribsVk->GetVkBuffer(), pIndirectDrawAttribsVk->GetDynamicOffset(m_ContextId, this) + Attribs.IndirectDrawArgsOffset, drawCallCount, sizeof(VkDrawIndirectCommand));
     ++m_State.NumCommands;
 }
 
@@ -579,7 +579,7 @@ void DeviceContextVkImpl::MultiDrawIndexedIndirect(const DrawIndexedIndirectAttr
 
     PrepareForIndexedDraw(Attribs.Flags, Attribs.IndexType);
 
-    m_CommandBuffer.DrawIndexedIndirect(pIndirectDrawAttribsVk->GetVkBuffer(), pIndirectDrawAttribsVk->GetDynamicOffset(m_ContextId, this) + Attribs.IndirectDrawArgsOffset, drawCallCount, 0);
+    m_CommandBuffer.DrawIndexedIndirect(pIndirectDrawAttribsVk->GetVkBuffer(), pIndirectDrawAttribsVk->GetDynamicOffset(m_ContextId, this) + Attribs.IndirectDrawArgsOffset, drawCallCount, sizeof(VkDrawIndexedIndirectCommand));
     ++m_State.NumCommands;
 }
 
